@@ -9,6 +9,7 @@ var request = require('request');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
+var argv = require('optimist').argv;
 var today = require('./lib/today-path.js');
 var basePath = "";    //保存文件path日期部分，请求后获取
 var logFile = today.logFile();
@@ -16,6 +17,12 @@ var download = require('./lib/download.js');
 var config = require('./lib/config.js');
 var writeLog = require('./lib/log.js').writeLog;
 var readLog = require('./lib/log.js').readLog;
+
+
+//如果传入了 -p 参数，则替换设置文件的
+if(argv.p){
+  config.pixiv.saveFolder = argv.p;
+}
 
 var logImages = readLog(logFile);   //读取log日志记录的文件
 
