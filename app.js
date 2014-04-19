@@ -5,7 +5,7 @@
 //Desc: 主程序入口，执行 node app.js
 //Author: Myon, myon.cn@gmail.com
 
-var $ = require('jquery').create();
+var request = require('request');
 var fs = require('fs');
 var path = require('path');
 var today = require('./lib/today-path.js');
@@ -24,39 +24,39 @@ var images = [];
 
 
 //从每日图片排行网页抓图
-$.get(config.pixiv.fetchUrl,function(data){
-  //图片列表
-  var items = $(data).find('.ranking-item');
+request.get(config.pixiv.fetchUrl,function(err,res,body){
+    //图片列表
+  var items = JSON.parse(body).contents;
+
   //遍历获取所有图片信息
-  $.each(items,function(index,item){
+  for(var i=0;i<items.length;i++){
+    var item = items[i];
     var tempimg = {};
-    tempimg.rank = $(item).attr("data-rank");
-    tempimg.username = $(item).attr("data-user-name");
-    tempimg.title = $(item).attr("data-title");
-    tempimg.date = $(item).attr("data-date");
-    tempimg.ilustSrc = $(item).find('IMG._thumbnail.ui-scroll-view').attr("data-src");
-    tempimg.url = $(item).find('IMG._thumbnail.ui-scroll-view')
-      .attr("data-src")
-      .replace(/^(.*\/)mobile\/(.*)_.*(\..*)$/g,"$1$2$3");
+    tempimg.rank = item.rank;
+    tempimg.username = item.user_name;
+    tempimg.title = item.title;
+    tempimg.date = item.date;
+    tempimg.illustSrc = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + item.illust_id;
+    tempimg.url = item.url.replace(/^(.*\/)mobile\/(.*)_.*(\..*)$/g,"$1$2$3");
     tempimg.filename = "#"+tempimg.rank+"."+ tempimg.url.match(/[^/]*(\.gif|\.jpg|\.jpeg|\.png)$/g)[0];
     //查看是否成功已经下载过该文件
     //如果文件下载过则把image对象的替换，complete为true（之后download那边会判断）
     if(logImages){
           console.log(9);
-      $.each(logImages.success,function(index,image){
-        if(image.ilustSrc == tempimg.ilustSrc){
+      for(var j=0;j<logImages.success.length;j++){
+        var image = logImages.success[j];
+        if(image.illustSrc == tempimg.illustSrc){
           tempimg = image;
         }
-      });
+      }
     }
     images.push(tempimg);
-  });
+  }
   console.log(images);
   //下载图片
-  $.each(images,function(index,image){
-    //console.log(image);
-    download.gen(image,basePath);
-  });
+  for(var k=0;k<images.length;k++){
+    download.gen(images[k],basePath);
+  }
 });
 
 
