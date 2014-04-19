@@ -16,8 +16,9 @@
 ###设置
 
 所有设置都在`lib/config.js`里，比较重要的选项：
-`saveFolder`：下载图片保存的路径，可以填绝对或相对路径
-`maxRetryTime`：下载失败重试次数
+
+* `saveFolder`：  下载图片保存的路径，可以填绝对或相对路径
+* `maxRetryTime`：下载失败重试次数
 
 ###图片保存目录说明
 

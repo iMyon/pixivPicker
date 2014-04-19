@@ -8,8 +8,9 @@
 var request = require('request');
 var fs = require('fs');
 var path = require('path');
+var mkdirp = require('mkdirp');
 var today = require('./lib/today-path.js');
-var basePath = today.imagePath();
+var basePath = "";    //保存文件path日期部分，请求后获取
 var logFile = today.logFile();
 var download = require('./lib/download.js');
 var config = require('./lib/config.js');
@@ -27,6 +28,10 @@ var images = [];
 request.get(config.pixiv.fetchUrl,function(err,res,body){
     //图片列表
   var items = JSON.parse(body).contents;
+  basePath = JSON.parse(body).date
+    .replace(/^(\d{4})(\d{2})(\d{2})$/g,path.join("$1","$2","$3"));
+  basePath = path.join(config.pixiv.saveFolder,basePath);
+  mkdirp.sync(basePath);
 
   //遍历获取所有图片信息
   for(var i=0;i<items.length;i++){
