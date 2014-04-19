@@ -2,9 +2,9 @@
 
 抓取p站每日前50图片
 
-###依赖项
+###运行环境
 
-使用nodejs编写，使用前需安装nodejs，[官网下载](http://nodejs.org/)
+使用前需安装nodejs，[官网下载](http://nodejs.org/)
 
 ###使用说明
 
