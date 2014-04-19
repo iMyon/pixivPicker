@@ -6,6 +6,8 @@
 //Author: Myon, myon.cn@gmail.com
 
 var $ = require('jquery').create();
+var fs = require('fs');
+var path = require('path');
 var today = require('./lib/today-path.js');
 var basePath = today.imagePath();
 var logFile = today.logFile();
@@ -101,6 +103,8 @@ $.get(config.pixiv.fetchUrl,function(data){
       download.gen(image,basePath);
     }
     else{
+      //删除临时文件
+      fs.unlink(path.join(basePath,image.filename));   //删除文件
       console.warn(image.filename + " 下载失败,已达到下载次数限制");
       ccount++;
       failcount++;
