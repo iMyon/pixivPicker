@@ -2,6 +2,10 @@
 
 抓取p站每日前50图片
 
+###警告
+
+此版本为beta版，可能出现问题，如果不想当小白鼠建议切换到master分支
+
 ###运行环境
 
 使用前需安装nodejs，[官网下载](http://nodejs.org/)
@@ -25,7 +29,7 @@
 --url     | 请求网址，下面有列表
 --abbr    | 文件夹命名后缀，如 `--abbr=r_18` 则文件存放路径大致如下path/to/2014/4/15_r18
 
-示例：`node app.js -p /home/myon/pixiv`
+示例：`node app.js --path=/home/myon/pixiv`
 
 ###设置
 
@@ -54,7 +58,7 @@
 
 ######获取cookie的方法
 
-[拖拽我到书签栏](javascript:alert(document.cookie);void(0);)  到p站点击，复制粘贴
+[拖拽我到书签栏](javascript:alert%28document.cookie%29;void%280%29;)  到p站点击，复制粘贴
 
 
 ###图片保存目录说明
