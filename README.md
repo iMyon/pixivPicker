@@ -54,11 +54,12 @@
 
 #####cookie设置  
 
-当前目录新建.cookie文件，填写pixiv已登录状态的cookie
+app.js同目录新建.cookie文件，填写pixiv已登录状态的cookie
 
 ######获取cookie的方法
 
-[拖拽我到书签栏](javascript:alert%28document.cookie%29;void%280%29;)  到p站点击，复制粘贴
+小书签：`javascript:alert(document.cookie);void(0);`  
+到p站点击，复制粘贴
 
 
 ###图片保存目录说明
