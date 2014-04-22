@@ -1,2 +1,16 @@
 set ws=wscript.createobject("wscript.shell")
-ws.run ws.CurrentDirectory+"\run.bat /start",0
+
+' 获取脚本路径
+Function scriptPath(strFileName)
+  ' 将类Unix路径 / 替换为 \
+  strFileName = Replace(strFileName, "/", "\")
+ 
+  Dim iPos
+  ' 从路径末尾开始搜索\，这样从第一个字符到这个位置
+  ' 就是我们所需要的
+  iPos = InStrRev(strFileName, "\")
+  ' 使用Left保留需要的部分
+  scriptPath = Left(strFileName, iPos)
+End Function
+
+ws.run scriptPath(WScript.ScriptFullName)+"\run.bat /start",0
