@@ -35,6 +35,8 @@
 --path    | 保存路径
 --url     | 请求网址，下面有列表
 --abbr    | 文件夹命名后缀，如 `--abbr=r_18` 则文件存放路径大致如下path/to/2014/4/15_r18
+--username| 用户id，用于模拟登录获取cookie
+--passwd  | 用户密码，用于模拟登录获取cookie
 
 示例：`node app.js --path=/home/myon/pixiv`
 
@@ -48,6 +50,8 @@
 * `tabOnly` :根据tag过滤关键字，只下载tag中包含关键字的图片  
     `tag`可以自行查看log日志文件分析，格式化日志文件可以[点这里](http://jsbeautifier.org/)
 * `fetchUrl`:抓取网页的类型，列表 ,参数--url 可以设置的值 
+* `pixiv_id`:用户id，用于模拟登录获取cookie，参数--username指定了的话则此设置不生效
+* `pass`:    用户密码，用于模拟登录获取cookie，参数--passwd指定了的话则此设置不生效
 
 说明             |   地址
 ----------------|---------------------------------
@@ -87,6 +91,7 @@
 
 #####cookie设置  
 
+***如果模拟登录获取不到cookie的话可以试试手动填写***  
 r18图片需要设置cookie才能下载，没有这个需求的的可无视此项设置  
 app.js同目录新建`.cookie`（首次运行也会生成一个示例文件，需替换成自己的才能生效）文件，填写pixiv已登录状态的cookie
 
