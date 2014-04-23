@@ -13,4 +13,6 @@ Function scriptPath(strFileName)
   scriptPath = Left(strFileName, iPos)
 End Function
 
-ws.run scriptPath(WScript.ScriptFullName)+"\run.bat /start",0
+cmd = """"+scriptPath(WScript.ScriptFullName)+"\run.bat"" /start"
+
+ws.run cmd

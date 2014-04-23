@@ -10,13 +10,11 @@ var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
 var argv = require('optimist').argv;
-var today = require('./lib/today-path.js');
+var storage = require('./lib/storage.js');
 var basePath = "";    //保存文件path日期部分，请求后获取
-var logFile = today.logFile();
+var logFile = storage.logFile();
 var download = require('./lib/download.js');
 var config = require('./lib/config.js');
-var writeLog = require('./lib/log.js').writeLog;
-var readLog = require('./lib/log.js').readLog;
 var pixiv = require('./lib/pixivLogin.js');
 var filter = require('./lib/filter.js');
 
@@ -44,12 +42,13 @@ pixiv.login(config.pixiv.login.form);
 
 logFile += config.pixiv.pathAbbr;
 
-var logImages = readLog(logFile);   //读取log日志记录的文件
+var logImages = storage.readLog(logFile);   //读取log日志记录的文件
 
 //存放图片信息的数组
 var images = [];
 //存放push到images的临时信息
 
+console.log("获取列表中");
 //获取cookie之后
 pixiv.on("getCookie",function(pixiv){
   //从每日图片排行网页抓图
@@ -86,7 +85,7 @@ pixiv.on("getCookie",function(pixiv){
         var tempimg = item;
         tempimg.illustSrc = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + item.illust_id;
         tempimg.url = item.url.replace(/^(.*\/)mobile\/(.*)_.*(\..*)$/g,"$1$2$3");
-        tempimg.filename = "#"+tempimg.rank+"."+ tempimg.url.match(/[^\/]*(\.gif|\.jpg|\.jpeg|\.png)$/g)[0];
+        tempimg.filename = storage.formatFilename(tempimg,config.pixiv.filenameFormat) + ".jpg";
         tempimg.basePath = basePath;
         //查看是否成功已经下载过该文件
         //如果文件下载过则把image对象的替换，complete为true（之后download那边会判断）
@@ -101,10 +100,11 @@ pixiv.on("getCookie",function(pixiv){
         images.push(tempimg);
       }
       // console.log(images);
+      console.log("下载开始");
       //下载图片
       for(var k=0;k<images.length;k++){
         download.gen(images[k],images[k].basePath,pixiv);
-    }
+      }
   });
 
 
@@ -116,24 +116,24 @@ pixiv.on("getCookie",function(pixiv){
     download.on("finishADownload",function(image){
       succount++;
       ccount++;
-      console.log(image.filename + " 已完成 " + "   剩余 " + (images.length - ccount) + " 个下载任务");
+      console.log(" 下载成功  -> " + image.filename + "   剩余 " + (images.length - ccount));
       if(ccount >= images.length){
         download.emit("allFinished");
       }
       image.path = path.join(image.basePath,image.filename);
-      writeLog(logFile,images);     //每下载完一个 写入日志
+      storage.writeLog(logFile,images);     //每下载完一个 写入日志
     });
     download.on("hasDownloaded",function(image){
       succount++;
       ccount++;
-      console.log(image.filename + " 已经下载过 " + "   剩余 " + (images.length - ccount) + " 个下载任务");
+      console.log("已经下载过 -> " + image.filename + "   剩余 " + (images.length - ccount));
       if(ccount >= images.length){
         download.emit("allFinished");
       }
     });
     //404错误处理
     download.on('res404',function(image){
-      console.warn(image.filename + " 发生404错误,尝试使用png下载该图");
+      console.warn("  png下载  -> " + image.filename);
       image.url = image.url.replace(/\.jpg/,".png");
       image.filename = image.filename.replace(/\.jpg/,".png");
       download.gen(image,image.basePath,pixiv);
@@ -141,14 +141,14 @@ pixiv.on("getCookie",function(pixiv){
     //全部下载完成信号处理
     download.on('allFinished',function(){
       console.log("下载结束，成功 " + succount + " ,失败 " + failcount);
-      writeLog(logFile,images);
+      storage.writeLog(logFile,images);
     });
     //处理下载失败/相册下载
     download.on('failDownload',function(image){
       if((image.retryTime||0) < config.pixiv.maxRetryTime){
         //下载次数+1
         image.retryTime = (image.retryTime||0) + 1;
-        console.warn(image.filename + " 下载失败,尝试重新下载");
+        console.warn(" 重新下载  -> " + image.filename);
         download.gen(image,image.basePath,pixiv);
       }
       else{
@@ -160,12 +160,14 @@ pixiv.on("getCookie",function(pixiv){
         }
         else{
           ccount++;
-          console.warn(image.filename + " 下载失败,已达到下载次数限制");
+          console.warn(" 下载失败  -> " + image.filename + " -> 已达到下载次数限制");
           if(image.is_xiangce){
             image.complete = true;
+            image.xiangce.pop();
             succount++;
-            console.log(image.illust_id+" 下载完成"
-             + "   剩余 " + (images.length - ccount) + " 个下载任务");
+            console.log(" 下载成功  -> " + image.basePath
+             + "   剩余 " + (images.length - ccount));
+            storage.writeLog(logFile,images);
           }
           else{
             failcount++;
@@ -180,24 +182,26 @@ pixiv.on("getCookie",function(pixiv){
     download.on("xiangceDownload",function(image){
       if(!image.is_xiangce){   //没有则创建并初始化
         image.xiangce = [];
-        console.log(image.filename+"  猜测下载图片为相册形式")
+        console.log("画册下载 -> " + image.filename)
         image.url = image.url.replace(/(\.gif|\.jpg|\.jpeg|\.png)$/,"_p" + 0 + ".jpg");
-        image.filename = image.url.match(/\/([^\/]+)$/)[1];
+        image.filename = image.url.match(/\/[^\/]+_p([^\/]+)$/)[1];
         image.xiangce.push(image.filename);
         image.is_xiangce = true;
-        image.count = 0;
         //创建目录
-        image.basePath = path.join(image.basePath,"#"+image.rank+"."+image.illust_id);
+        image.basePath = path.join(image.basePath,storage.formatFilename(image,config.pixiv.filenameFormat));
         mkdirp.sync(image.basePath);
         // 开始下载
         download.gen(image,image.basePath,pixiv);
       }
       else{
-        console.log(image.filename + " 下载成功");
-        image.count++;
-        image.url = image.url.replace(/_p\d+(\.gif|\.jpg|\.jpeg|\.png)$/,"_p" + image.count + ".jpg");
-        image.filename = image.url.match(/\/([^\/]+)$/)[1];
+        console.log("下载成功 -> " + path.join(
+          storage.formatFilename(image,config.pixiv.filenameFormat)
+          ,image.filename
+        ));
         image.xiangce.push(image.filename);
+        image.url = image.url.replace(/_p\d+(\.gif|\.jpg|\.jpeg|\.png)$/,"_p"
+          + image.xiangce.length + ".jpg");
+        image.filename = image.url.match(/\/[^\/]+_p([^\/]+)$/)[1];
         download.gen(image,image.basePath,pixiv);
       }
     });
