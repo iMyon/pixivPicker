@@ -48,13 +48,13 @@ var logImages = storage.readLog(logFile);   //读取log日志记录的文件
 var images = [];
 //存放push到images的临时信息
 
-console.log("获取列表中");
 //获取cookie之后
 pixiv.on("getCookie",function(pixiv){
   //从每日图片排行网页抓图
   var j = request.jar();
   var rcookie = request.cookie(pixiv.cookie);
   j.setCookie(rcookie, config.pixiv.fetchUrl);
+  console.log("获取列表中");
   request(
     {
       url:config.pixiv.fetchUrl,
@@ -66,7 +66,8 @@ pixiv.on("getCookie",function(pixiv){
       try{
         JSON.parse(body);
       }catch(e){
-        throw "cookie有误，请设置正确的账号密码，并尝试重新运行";
+        console.log("cookie有误，请设置正确的账号密码，并尝试重新运行");
+        throw -1;
       }
       var items = JSON.parse(body).contents;
       basePath = JSON.parse(body).date

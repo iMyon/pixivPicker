@@ -1,18 +1,18 @@
 set ws=wscript.createobject("wscript.shell")
 
-' è·å–è„šæœ¬è·¯å¾„
+' »ñÈ¡½Å±¾Â·¾¶
 Function scriptPath(strFileName)
-  ' å°†ç±»Unixè·¯å¾„ / æ›¿æ¢ä¸º \
+  ' ½«ÀàUnixÂ·¾¶ / Ìæ»»Îª \
   strFileName = Replace(strFileName, "/", "\")
  
   Dim iPos
-  ' ä»è·¯å¾„æœ«å°¾å¼€å§‹æœç´¢\ï¼Œè¿™æ ·ä»ç¬¬ä¸€ä¸ªå­—ç¬¦åˆ°è¿™ä¸ªä½ç½®
-  ' å°±æ˜¯æˆ‘ä»¬æ‰€éœ€è¦çš„
+  ' ´ÓÂ·¾¶Ä©Î²¿ªÊ¼ËÑË÷\£¬ÕâÑù´ÓµÚÒ»¸ö×Ö·ûµ½Õâ¸öÎ»ÖÃ
+  ' ¾ÍÊÇÎÒÃÇËùĞèÒªµÄ
   iPos = InStrRev(strFileName, "\")
-  ' ä½¿ç”¨Leftä¿ç•™éœ€è¦çš„éƒ¨åˆ†
+  ' Ê¹ÓÃLeft±£ÁôĞèÒªµÄ²¿·Ö
   scriptPath = Left(strFileName, iPos)
 End Function
 
 cmd = """"+scriptPath(WScript.ScriptFullName)+"\run.bat"" /start"
 
-ws.run cmd
+ws.run cmd,0
