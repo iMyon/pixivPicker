@@ -18,6 +18,7 @@ var config = require('./lib/config.js');
 var writeLog = require('./lib/log.js').writeLog;
 var readLog = require('./lib/log.js').readLog;
 var pixiv = require('./lib/pixivLogin.js');
+var filter = require('./lib/filter.js');
 
 //如果传入了 -p 参数，则替换保存目录
 if(argv.path){
@@ -77,6 +78,11 @@ pixiv.on("getCookie",function(pixiv){
       //遍历获取所有图片信息
       for(var i=0;i<items.length;i++){
         var item = items[i];
+        var is_pass = filter.tagFilter(item);
+        //进入下一个循环
+        if(is_pass === true){
+          continue;
+        }
         var tempimg = item;
         tempimg.illustSrc = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + item.illust_id;
         tempimg.url = item.url.replace(/^(.*\/)mobile\/(.*)_.*(\..*)$/g,"$1$2$3");
@@ -85,7 +91,6 @@ pixiv.on("getCookie",function(pixiv){
         //查看是否成功已经下载过该文件
         //如果文件下载过则把image对象的替换，complete为true（之后download那边会判断）
         if(logImages){
-              console.log(9);
           for(var j=0;j<logImages.success.length;j++){
             var image = logImages.success[j];
             if(image.illust_id == tempimg.illust_id){
@@ -95,7 +100,7 @@ pixiv.on("getCookie",function(pixiv){
         }
         images.push(tempimg);
       }
-      console.log(images);
+      // console.log(images);
       //下载图片
       for(var k=0;k<images.length;k++){
         download.gen(images[k],images[k].basePath,pixiv);
