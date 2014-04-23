@@ -10,6 +10,13 @@
 
 使用前需安装nodejs，[官网下载](http://nodejs.org/)
 
+###安装  
+
+* 使用 git 下载  
+    `git clone https://github.com/iMyon/pixivPicker.git -b beta`  
+* 直接下载压缩包  
+    点击右边的`download zip`
+
 ###使用说明
 
 ####不带参数运行
@@ -37,6 +44,9 @@
 
 * `saveFolder`：  下载图片保存的路径，可以填绝对或相对路径
 * `maxRetryTime`：下载失败重试次数
+* `tabPass` :根据tag过滤关键字，满足条件则此图片不下载  
+* `tabOnly` :根据tag过滤关键字，只下载tag中包含关键字的图片  
+    `tag`可以自行查看log日志文件分析，格式化日志文件可以[点这里](http://jsbeautifier.org/)
 * `fetchUrl`:抓取网页的类型，列表 ,参数--url 可以设置的值 
 
 说明             |   地址
@@ -54,11 +64,14 @@
 
 #####cookie设置  
 
-当前目录新建.cookie文件，填写pixiv已登录状态的cookie
+r18图片需要设置cookie才能下载，没有这个需求的的可无视此项设置  
+app.js同目录新建`.cookie`（首次运行也会生成一个示例文件，需替换成自己的才能生效）文件，填写pixiv已登录状态的cookie
 
 ######获取cookie的方法
 
-[拖拽我到书签栏](javascript:alert%28document.cookie%29;void%280%29;)  到p站点击，复制粘贴
+小书签：`javascript:alert(document.cookie);void(0);`  
+小书签运行方法可参照[各种浏览器运行所谓「JS代码/脚本」的方法](http://tieba.baidu.com/p/1620692564)
+到p站点击，复制粘贴
 
 
 ###图片保存目录说明
