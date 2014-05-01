@@ -144,8 +144,12 @@ pixiv.on("getCookie",function(pixiv){
     });
     //全部下载完成信号处理
     download.on('allFinished',function(){
-      console.log("下载结束，成功 " + succount + " ,失败 " + failcount);
       storage.writeLog(logFile,images);
+      console.log("下载结束，成功 " + succount + " ,失败 " + failcount);
+      //显式结束进程
+      setTimeout(function(){
+        process.exit()
+      },2000);
     });
     //处理下载失败/相册下载
     download.on('failDownload',function(image){
@@ -211,3 +215,8 @@ pixiv.on("getCookie",function(pixiv){
     });
   })();//(闭包)
 });
+
+//超过时间就结束进程
+setTimeout(function(){
+  process.exit()
+},config.timeout);
