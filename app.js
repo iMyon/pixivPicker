@@ -12,7 +12,6 @@ var mkdirp = require('mkdirp');
 var argv = require('optimist').argv;
 var storage = require('./lib/storage.js');
 var basePath = "";    //保存文件path日期部分，请求后获取
-var logFile = storage.logFile();
 var download = require('./lib/download.js');
 var config = require('./lib/config.js');
 var pixiv = require('./lib/pixivLogin.js');
@@ -40,10 +39,6 @@ if(argv.passwd){
 //获取cookie 成功后发送getCookie信号
 pixiv.login(config.pixiv.login.form);
 
-logFile += config.pixiv.pathAbbr;
-
-var logImages = storage.readLog(logFile);   //读取log日志记录的文件
-
 //存放图片信息的数组
 var images = [];
 //存放push到images的临时信息
@@ -66,7 +61,9 @@ pixiv.on("getCookie",function(pixiv){
       try{
         JSON.parse(body);
       }catch(e){
-        console.log("cookie有误，请设置正确的账号密码，并尝试重新运行");
+        fs.unlink(config.pixiv.cookieFile);
+        console.log("cookie有误 或者 你的pixiv设置中未开启r18")
+        console.log("请设置正确的账号密码和pixiv设置，并尝试重新运行");
         throw -1;
       }
       var items = JSON.parse(body).contents;
@@ -74,6 +71,12 @@ pixiv.on("getCookie",function(pixiv){
         .replace(/^(\d{4})(\d{2})(\d{2})$/g,path.join("$1","$2","$3"));
       basePath = path.join(config.pixiv.saveFolder,basePath+config.pixiv.pathAbbr);
       mkdirp.sync(basePath);
+
+      // 获取并读取日志文件
+      logFile = JSON.parse(body).date
+        .replace(/^(\d{4})(\d{2})(\d{2})$/g,path.join(config.pixiv.logPath,"$1-$2-$3"));
+      logFile += config.pixiv.pathAbbr;
+      var logImages = storage.readLog(logFile);   //读取log日志记录的文件
 
       //遍历获取所有图片信息
       for(var i=0;i<items.length;i++){
@@ -141,8 +144,12 @@ pixiv.on("getCookie",function(pixiv){
     });
     //全部下载完成信号处理
     download.on('allFinished',function(){
-      console.log("下载结束，成功 " + succount + " ,失败 " + failcount);
       storage.writeLog(logFile,images);
+      console.log("下载结束，成功 " + succount + " ,失败 " + failcount);
+      //显式结束进程
+      setTimeout(function(){
+        process.exit()
+      },2000);
     });
     //处理下载失败/相册下载
     download.on('failDownload',function(image){
@@ -208,3 +215,8 @@ pixiv.on("getCookie",function(pixiv){
     });
   })();//(闭包)
 });
+
+//超过时间就结束进程
+setTimeout(function(){
+  process.exit()
+},config.timeout);
