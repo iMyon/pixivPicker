@@ -73,10 +73,16 @@ pixiv.on("getCookie",function(pixiv){
       mkdirp.sync(basePath);
 
       // 获取并读取日志文件
+      //今天日志
       logFile = JSON.parse(body).date
         .replace(/^(\d{4})(\d{2})(\d{2})$/g,path.join(config.pixiv.logPath,"$1-$2-$3"));
       logFile += config.pixiv.pathAbbr;
       var logImages = storage.readLog(logFile);   //读取log日志记录的文件
+      //昨天日志(如果今日榜有昨天的则去除)
+      var yesLogFile = JSON.parse(body).prev_date
+        .replace(/^(\d{4})(\d{2})(\d{2})$/g,path.join(config.pixiv.logPath,"$1-$2-$3"));
+      yesLogFile += config.pixiv.pathAbbr;
+      var yesLogImages = storage.readLog(yesLogFile);   //读取log日志记录的文件
 
       //遍历获取所有图片信息
       for(var i=0;i<items.length;i++){
@@ -93,9 +99,19 @@ pixiv.on("getCookie",function(pixiv){
         tempimg.basePath = basePath;
         //查看是否成功已经下载过该文件
         //如果文件下载过则把image对象的替换，complete为true（之后download那边会判断）
+        //今日
         if(logImages){
           for(var j=0;j<logImages.success.length;j++){
             var image = logImages.success[j];
+            if(image.illust_id == tempimg.illust_id){
+              tempimg = image;
+            }
+          }
+        }
+        //昨日
+        if(yesLogImages){
+          for(var j=0;j<yesLogImages.success.length;j++){
+            var image = yesLogImages.success[j];
             if(image.illust_id == tempimg.illust_id){
               tempimg = image;
             }
