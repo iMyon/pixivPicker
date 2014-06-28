@@ -5,30 +5,16 @@
 //Desc: 主程序入口，执行 node app.js
 //Author: Myon, myon.cn@gmail.com
 
-var request = require('request');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
 var argv = require('optimist').argv;
 var storage = require('./lib/storage.js');
-var basePath = "";    //保存文件path日期部分，请求后获取
 var download = require('./lib/download.js');
 var config = require('./lib/config.js');
 var pixiv = require('./lib/pixivLogin.js');
-var filter = require('./lib/filter.js');
+var getImages = require('./lib/getImagesArray.js');
 
-//如果传入了 -p 参数，则替换保存目录
-if(argv.path){
-  config.pixiv.saveFolder = argv.path;
-}
-//如果传入了 -url 参数，则替换请求网址
-if(argv.url){
-  config.pixiv.fetchUrl = argv.url;
-}
-//如果传入了 -abbr 参数，则替换目录追加路径
-if(argv.abbr){
-  config.pixiv.pathAbbr = argv.abbr;
-}
 if(argv.username){
   config.pixiv.login.form.pixiv_id = argv.username;
 }
@@ -39,95 +25,13 @@ if(argv.passwd){
 //获取cookie 成功后发送getCookie信号
 pixiv.login(config.pixiv.login.form);
 
-//存放图片信息的数组
-var images = [];
-//存放push到images的临时信息
-
-//获取cookie之后
-pixiv.on("getCookie",function(pixiv){
-  //从每日图片排行网页抓图
-  var j = request.jar();
-  var rcookie = request.cookie(pixiv.cookie);
-  j.setCookie(rcookie, config.pixiv.fetchUrl);
-  console.log("获取列表中");
-  request(
-    {
-      url:config.pixiv.fetchUrl,
-      headers: config.pixiv.headers,
-      jar:j
-    },
-    function(err,res,body){
-      //图片列表
-      try{
-        JSON.parse(body);
-      }catch(e){
-        fs.unlink(config.pixiv.cookieFile);
-        console.log("cookie有误 或者 你的pixiv设置中未开启r18")
-        console.log("请设置正确的账号密码和pixiv设置，并尝试重新运行");
-        throw -1;
-      }
-      var items = JSON.parse(body).contents;
-      basePath = JSON.parse(body).date
-        .replace(/^(\d{4})(\d{2})(\d{2})$/g,path.join("$1","$2","$3"));
-      basePath = path.join(config.pixiv.saveFolder,basePath+config.pixiv.pathAbbr);
-      mkdirp.sync(basePath);
-
-      // 获取并读取日志文件
-      //今天日志
-      logFile = JSON.parse(body).date
-        .replace(/^(\d{4})(\d{2})(\d{2})$/g,path.join(config.pixiv.logPath,"$1-$2-$3"));
-      logFile += config.pixiv.pathAbbr;
-      var logImages = storage.readLog(logFile);   //读取log日志记录的文件
-      //昨天日志(如果今日榜有昨天的则去除)
-      var yesLogFile = JSON.parse(body).prev_date
-        .replace(/^(\d{4})(\d{2})(\d{2})$/g,path.join(config.pixiv.logPath,"$1-$2-$3"));
-      yesLogFile += config.pixiv.pathAbbr;
-      var yesLogImages = storage.readLog(yesLogFile);   //读取log日志记录的文件
-
-      //遍历获取所有图片信息
-      for(var i=0;i<items.length;i++){
-        var item = items[i];
-        var is_pass = filter.tagFilter(item);
-        //进入下一个循环
-        if(is_pass === true){
-          continue;
-        }
-        var tempimg = item;
-        tempimg.illustSrc = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + item.illust_id;
-        tempimg.url = item.url.replace(/^(.*\/)mobile\/(.*)_.*(\..*)$/g,"$1$2$3");
-        tempimg.filename = storage.formatFilename(tempimg,config.pixiv.filenameFormat) + ".jpg";
-        tempimg.basePath = basePath;
-        //查看是否成功已经下载过该文件
-        //如果文件下载过则把image对象的替换，complete为true（之后download那边会判断）
-        //今日
-        if(logImages){
-          for(var j=0;j<logImages.success.length;j++){
-            var image = logImages.success[j];
-            if(image.illust_id == tempimg.illust_id){
-              tempimg = image;
-            }
-          }
-        }
-        //昨日
-        if(yesLogImages){
-          for(var j=0;j<yesLogImages.success.length;j++){
-            var image = yesLogImages.success[j];
-            if(image.illust_id == tempimg.illust_id){
-              tempimg = image;
-            }
-          }
-        }
-        images.push(tempimg);
-      }
-      // console.log(images);
-      console.log("下载开始");
-      //下载图片
-      for(var k=0;k<images.length;k++){
-        download.gen(images[k],images[k].basePath,pixiv);
-      }
-  });
-
-
+if(config.pixiv.fetchUrl.match("http://www.pixiv.net/ranking.php")){
+  pixiv.on("getCookie",getImages.rankImages);
+}
+else{
+  pixiv.on("getCookie",getImages.authorImages);
+}
+getImages.on("getImages",function(images){
   //处理每个图片下载完成信号
   (function(){
     var ccount = 0;             //已完成数量
@@ -230,6 +134,10 @@ pixiv.on("getCookie",function(pixiv){
       }
     });
   })();//(闭包)
+  //放在后边执行，以免上面的on来不及接受信号
+  for(var k=0;k<images.length;k++){
+    download.gen(images[k],images[k].basePath,pixiv);
+  }
 });
 
 //超过时间就结束进程
