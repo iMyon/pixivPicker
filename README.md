@@ -9,7 +9,8 @@
 ###安装  
 
 * 使用 git 下载  
-    `git clone https://github.com/iMyon/pixivPicker.git -b beta`  
+    稳定版 `git clone https://github.com/iMyon/pixivPicker.git`  
+    beta版 `git clone https://github.com/iMyon/pixivPicker.git -b beta`  
 * 直接下载压缩包  
     点击右边的`download zip`
 
@@ -36,8 +37,10 @@
 --abbr    | 文件夹命名后缀，如 `--abbr=r_18` 则文件存放路径大致如下path/to/2014/4/15_r18
 --username| 用户id，用于模拟登录获取cookie
 --passwd  | 用户密码，用于模拟登录获取cookie
+--force   | 跳过下载历史记录，强制重新下载，该参数不需要给定值
+--skipce  | 不下载相册，该参数不需要给定值
 
-示例：`node app.js --path=/home/myon/pixiv`
+示例：`node app.js --skipce --path=/home/myon/pixiv`
 
 ###设置
 

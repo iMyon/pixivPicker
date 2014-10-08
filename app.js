@@ -108,13 +108,14 @@ getImages.on("getImages",function(images){
     });
     //开始相册下载
     download.on("xiangceDownload",function(image){
-      if(!image.is_xiangce){   //没有则创建并初始化
+      if(!image.xiangce_init){   //没有则创建并初始化
         image.xiangce = [];
         console.log("画册下载 -> " + image.filename)
-        image.url = image.url.replace(/(\.gif|\.jpg|\.jpeg|\.png)$/,"_p" + 0 + ".jpg");
+        // image.url = image.url.replace(/(\.gif|\.jpg|\.jpeg|\.png)$/,"_p" + 0 + ".jpg");
         image.filename = image.url.match(/\/[^\/]+_p([^\/]+)$/)[1];
         image.xiangce.push(image.filename);
         image.is_xiangce = true;
+        image.xiangce_init = true;
         //创建目录
         image.basePath = path.join(image.basePath,storage.formatFilename(image,config.pixiv.filenameFormat));
         mkdirp.sync(image.basePath);
