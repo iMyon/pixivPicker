@@ -91,7 +91,7 @@ getImages.on("getImages",function(images){
           console.warn(" 下载失败  -> " + image.filename + " -> 已达到下载次数限制");
           if(image.is_xiangce){
             image.complete = true;
-            image.xiangce.pop();
+            image.xiangce && image.xiangce.pop();
             succount++;
             console.log(" 下载成功  -> " + image.basePath
              + "   剩余 " + (images.length - ccount));
