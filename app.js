@@ -40,6 +40,7 @@ getImages.on("getImages",function(images){
     download.on("finishADownload",function(image){
       succount++;
       ccount++;
+      image.complete = true;
       console.log(" 下载成功  -> " + image.filename + "   剩余 " + (images.length - ccount));
       if(ccount >= images.length){
         download.emit("allFinished");
