@@ -61,7 +61,7 @@ getImages.on("getImages",function(images){
       console.warn("  png下载  -> " + image.filename);
       image.url = image.url.replace(/\.jpg/,".png");
       image.filename = image.filename.replace(/\.jpg/,".png");
-      download.gen(image,image.basePath,pixiv);
+      download.gen(image,path.join(image.basePath, image.filename),pixiv);
     });
     //全部下载完成信号处理
     download.on('allFinished',function(){
@@ -78,7 +78,7 @@ getImages.on("getImages",function(images){
         //下载次数+1
         image.retryTime = (image.retryTime||0) + 1;
         console.warn(" 重新下载  -> " + image.filename);
-        download.gen(image,image.basePath,pixiv);
+        download.gen(image,path.join(image.basePath, image.filename),pixiv);
       }
       else{
         //删除临时文件
@@ -90,15 +90,16 @@ getImages.on("getImages",function(images){
         else{
           ccount++;
           console.warn(" 下载失败  -> " + image.filename + " -> 已达到下载次数限制");
-          if(image.is_xiangce){
+          if(image.is_xiangce && image.xiangce && image.xiangce.length > 1){
             image.complete = true;
-            image.xiangce && image.xiangce.pop();
+            image.xiangce.pop();
             succount++;
             console.log(" 下载成功  -> " + image.basePath
              + "   剩余 " + (images.length - ccount));
             storage.writeLog(logFile,images);
           }
           else{
+            image.complete = false;
             failcount++;
           }
           if(ccount >= images.length){
@@ -121,7 +122,7 @@ getImages.on("getImages",function(images){
         image.basePath = path.join(image.basePath,storage.formatFilename(image,config.pixiv.filenameFormat));
         mkdirp.sync(image.basePath);
         // 开始下载
-        download.gen(image,image.basePath,pixiv);
+        download.gen(image,path.join(image.basePath, image.filename),pixiv);
       }
       else{
         console.log("下载成功 -> " + path.join(
@@ -132,13 +133,16 @@ getImages.on("getImages",function(images){
         image.url = image.url.replace(/_p\d+(\.gif|\.jpg|\.jpeg|\.png)$/,"_p"
           + image.xiangce.length + ".jpg");
         image.filename = image.url.match(/\/[^\/]+_p([^\/]+)$/)[1];
-        download.gen(image,image.basePath,pixiv);
+        download.gen(image,path.join(image.basePath, image.filename),pixiv);
       }
     });
   })();//(闭包)
   //放在后边执行，以免上面的on来不及接受信号
   for(var k=0;k<images.length;k++){
-    download.gen(images[k],images[k].basePath,pixiv);
+    if(images[k].is_xiangce)
+      download.emit("xiangceDownload", images[k]);
+    else
+      download.gen(images[k],path.join(images[k].basePath, images[k].filename),pixiv);
   }
 });
 
