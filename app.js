@@ -110,12 +110,11 @@ getImages.on("getImages",function(images){
     });
     //开始相册下载
     download.on("xiangceDownload",function(image){
-      if(!image.xiangce_init){   //没有则创建并初始化
+      if(! image.xiangce){   //没有则创建并初始化
         image.xiangce = [];
         console.log("画册下载 -> " + image.filename)
         // image.url = image.url.replace(/(\.gif|\.jpg|\.jpeg|\.png)$/,"_p" + 0 + ".jpg");
         image.filename = image.url.match(/\/[^\/]+_p([^\/]+)$/)[1];
-        image.xiangce.push(image.filename);
         image.is_xiangce = true;
         image.xiangce_init = true;
         //创建目录
@@ -129,10 +128,12 @@ getImages.on("getImages",function(images){
           storage.formatFilename(image,config.pixiv.filenameFormat)
           ,image.filename
         ));
-        image.xiangce.push(image.filename);
+        if(image.filename != image.xiangce[image.xiangce.length-1])
+          image.xiangce.push(image.filename);
+        storage.writeLog(logFile,images);
+        image.filename = image.xiangce.length + ".jpg";
         image.url = image.url.replace(/_p\d+(\.gif|\.jpg|\.jpeg|\.png)$/,"_p"
-          + image.xiangce.length + ".jpg");
-        image.filename = image.url.match(/\/[^\/]+_p([^\/]+)$/)[1];
+          + image.filename);
         download.gen(image,path.join(image.basePath, image.filename),pixiv);
       }
     });
