@@ -19,7 +19,7 @@ if(argv.username){
   config.pixiv.login.form.pixiv_id = argv.username;
 }
 if(argv.passwd){
-  config.pixiv.login.form.pass = argv.passwd;
+  config.pixiv.login.form.password = argv.passwd;
 }
 
 //获取cookie 成功后发送getCookie信号
