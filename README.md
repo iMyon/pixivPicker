@@ -1,12 +1,12 @@
-###pixivPicker
+### pixivPicker
 
 抓取p站每日前50图片
 
-###运行环境
+### 运行环境
 
 使用前需安装nodejs，[官网下载](http://nodejs.org/)
 
-###安装  
+### 安装  
 
 * 使用 git 下载  
     稳定版 `git clone https://github.com/iMyon/pixivPicker.git`  
@@ -17,9 +17,9 @@
 下载完成后在解压后的文件夹打开命令行窗口，运行`npm install`  
 运行后大概需要下载十多M的东西
 
-###使用说明
+### 使用说明
 
-####不带参数运行
+#### 不带参数运行
 
 不带参数会保存在设置文件设置的路径里
 
@@ -28,7 +28,7 @@
   * windows:
     * 右键使用nodejs打开`app.js`
 
-####参数列表
+#### 参数列表
 
 参数名    | 描述
 ----------|------------
@@ -42,7 +42,7 @@
 
 示例：`node app.js --skipce --path=/home/myon/pixiv`
 
-###设置
+### 设置
 
 所有设置都在`lib/config.js`里，比较重要的选项：
 
@@ -91,51 +91,51 @@
 
 反正就这几个参数，自己拼下  
 
-#####cookie设置  
+##### cookie设置  
 
 ***如果模拟登录获取不到cookie的话可以试试手动填写***  
 r18图片需要设置cookie才能下载，没有这个需求的的可无视此项设置  
 app.js同目录新建`.cookie`（首次运行也会生成一个示例文件，需替换成自己的才能生效）文件，填写pixiv已登录状态的cookie
 
-######获取cookie的方法
+###### 获取cookie的方法
 
 小书签：`javascript:alert(document.cookie);void(0);`  
 小书签运行方法可参照[各种浏览器运行所谓「JS代码/脚本」的方法](http://tieba.baidu.com/p/1620692564)  
 到p站点击，复制粘贴
 
 
-###图片保存目录说明
+### 图片保存目录说明
 
 默认保存在当前目录下的images目录 ，带参数的话保存在参数指定目录  
 以`yyyy/mm/dd${abbr}`结构的目录保存每日图片，期中日期为服务器日期，不是本地日期
 
-###日志说明
+### 日志说明
 以`yyyy-MM-dd${abbr}.log`形式保存在`log`目录，json格式
 
-###下载指定作者的全部作品  
+### 下载指定作者的全部作品  
 传递url参数的时候用作者作品页的链接即可下载所有作品，当前版本占内存较大，慎用。 例子：  
 命令行执行  `node app.js --url="http://www.pixiv.net/member_illust.php?id=3096443"`  
 保存的目录默认是指定path加作者用户名  
 
-###设置定时任务  
+### 设置定时任务  
 #### windows下设置定时执行的方法   
 
-#####1.控制面板找到计划任务，点击创建任务  
+##### 1.控制面板找到计划任务，点击创建任务  
 ![](http://imgsrc.baidu.com/forum/pic/item/06b921381f30e9242db7d2ab4e086e061c95f74e.jpg)  
 
-#####2.按图示设置如下
+##### 2.按图示设置如下
 ![](http://imgsrc.baidu.com/forum/pic/item/29891630e924b8993f2f37a26c061d950b7bf64e.jpg)  
-######新建触发器，图示为每隔20分执行一次，因为只有首次下载比较耗费网速，所以时间间隔任意
+###### 新建触发器，图示为每隔20分执行一次，因为只有首次下载比较耗费网速，所以时间间隔任意
 ![](http://imgsrc.baidu.com/forum/pic/item/93e9d809b3de9c82ce14b1156e81800a18d84363.png)  
 
-######启动程序填最新版本的run.vbe所在路径（需和app.js同路径）  
+###### 启动程序填最新版本的run.vbe所在路径（需和app.js同路径）  
 这个是后台静默运行run.bat，不会打开命令行窗口的，下载目录可以在run.bat设置
 ![](http://imgsrc.baidu.com/forum/pic/item/8ba26a2762d0f7033400dd460afa513d2797c52f.png)
   
-######条件选任何连接
+###### 条件选任何连接
 ![](http://imgsrc.baidu.com/forum/pic/item/b928a0014c086e0684bb71d100087bf40bd1cb4e.jpg)  
 
-####linux下设置定时任务  
+#### linux下设置定时任务  
 `crontab -e`
 具体百度，很简单
 

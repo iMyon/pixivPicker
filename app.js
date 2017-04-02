@@ -89,7 +89,8 @@ getImages.on("getImages",function(images){
         }
         else{
           ccount++;
-          console.warn(" 下载失败  -> " + image.filename + " -> 已达到下载次数限制");
+          if(!image.is_xiangce)
+            console.warn(" 下载失败  -> " + image.filename + " -> 已达到下载次数限制");
           if(image.is_xiangce && image.xiangce && image.xiangce.length > 1){
             image.complete = true;
             image.xiangce.pop();
@@ -137,8 +138,8 @@ getImages.on("getImages",function(images){
         download.gen(image,path.join(image.basePath, image.filename),pixiv);
       }
     });
-  })();//(闭包)
-  //放在后边执行，以免上面的on来不及接受信号
+  })();
+
   for(var k=0;k<images.length;k++){
     if(images[k].is_xiangce)
       download.emit("xiangceDownload", images[k]);
