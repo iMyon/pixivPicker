@@ -82,7 +82,12 @@ getImages.on("getImages",function(images){
       }
       else{
         //删除临时文件
-        fs.unlinkSync(path.join(image.basePath,image.filename));
+        var filePath = path.join(image.basePath,image.filename);
+        try{
+          fs.unlinkSync(filePath);
+        } catch (e) {
+
+        }
         // 尝试使用图册方式下载图片
         if(!image.is_xiangce){ //如果是一个顶级对象
           download.emit("xiangceDownload",image);   //发送相册下载信号
@@ -113,7 +118,7 @@ getImages.on("getImages",function(images){
     download.on("xiangceDownload",function(image){
       if(! image.xiangce){   //没有则创建并初始化
         image.xiangce = [];
-        console.log("画册下载 -> " + image.filename)
+        console.log("画册下载 -> " + image.filename);
         // image.url = image.url.replace(/(\.gif|\.jpg|\.jpeg|\.png)$/,"_p" + 0 + ".jpg");
         image.filename = image.url.match(/\/[^\/]+_p([^\/]+)$/)[1];
         image.is_xiangce = true;
