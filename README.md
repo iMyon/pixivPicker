@@ -10,7 +10,6 @@
 
 * 使用 git 下载  
     稳定版 `git clone https://github.com/iMyon/pixivPicker.git`  
-    beta版 `git clone https://github.com/iMyon/pixivPicker.git -b beta`  
 * 直接下载压缩包  
     点击右边的`download zip`
 
