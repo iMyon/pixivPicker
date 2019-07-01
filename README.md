@@ -56,14 +56,14 @@
 
 说明             |   地址
 ----------------|---------------------------------
-每日             |  http://www.pixiv.net/ranking.php?format=json&mode=daily&p=1
-每日r18          |  http://www.pixiv.net/ranking.php?format=json&mode=daily_r18&p=1
-每日r18g         |  http://www.pixiv.net/ranking.php?format=json&mode=daily_r18g&p=1
-每周             |  http://www.pixiv.net/ranking.php?format=json&mode=weekly&p=1
-每周r18          |  http://www.pixiv.net/ranking.php?format=json&mode=weekly_r18&p=1
-每日 r18g        |  http://www.pixiv.net/ranking.php?format=json&mode=weekly_r18g&p=1
-男性             |  http://www.pixiv.net/ranking.php?format=json&mode=male&p=1
-女性             |  http://www.pixiv.net/ranking.php?format=json&mode=female&p=1
+每日             |  https://www.pixiv.net/ranking.php?format=json&mode=daily&p=1
+每日r18          |  https://www.pixiv.net/ranking.php?format=json&mode=daily_r18&p=1
+每日r18g         |  https://www.pixiv.net/ranking.php?format=json&mode=daily_r18g&p=1
+每周             |  https://www.pixiv.net/ranking.php?format=json&mode=weekly&p=1
+每周r18          |  https://www.pixiv.net/ranking.php?format=json&mode=weekly_r18&p=1
+每日 r18g        |  https://www.pixiv.net/ranking.php?format=json&mode=weekly_r18g&p=1
+男性             |  https://www.pixiv.net/ranking.php?format=json&mode=male&p=1
+女性             |  https://www.pixiv.net/ranking.php?format=json&mode=female&p=1
 
 * `formatString`: 命名filename的格式 ，以下面为例子  
   如果填写`${user_name} - ${title}` 则输出 `nico - 勿忘草`   
@@ -113,7 +113,7 @@ app.js同目录新建`.cookie`（首次运行也会生成一个示例文件，�
 
 ### 下载指定作者的全部作品  
 传递url参数的时候用作者作品页的链接即可下载所有作品，当前版本占内存较大，慎用。 例子：  
-命令行执行  `node app.js --url="http://www.pixiv.net/member_illust.php?id=3096443"`  
+命令行执行  `node app.js --url="https://www.pixiv.net/member_illust.php?id=3096443"`  
 保存的目录默认是指定path加作者用户名  
 
 ### 设置定时任务  

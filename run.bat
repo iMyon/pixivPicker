@@ -1,5 +1,5 @@
 set imagePath="images"
-set url="http://www.pixiv.net/ranking.php?format=json&mode=daily&p=1"
+set url="https://www.pixiv.net/ranking.php?format=json&mode=daily&p=1"
 set abbr="_daily"
 set username=""
 set passwd=""

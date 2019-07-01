@@ -25,7 +25,7 @@ if(argv.passwd){
 //获取cookie 成功后发送getCookie信号
 pixiv.login(config.pixiv.login.form);
 
-if(config.pixiv.fetchUrl.match("http://www.pixiv.net/ranking.php")){
+if(config.pixiv.fetchUrl.match("https://www.pixiv.net/ranking.php")){
   pixiv.on("getCookie",getImages.rankImages);
 }
 else{
