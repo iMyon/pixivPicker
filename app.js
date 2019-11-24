@@ -88,29 +88,23 @@ getImages.on("getImages",function(images){
         } catch (e) {
 
         }
-        // 尝试使用图册方式下载图片
-        if(!image.is_xiangce){ //如果是一个顶级对象
-          download.emit("xiangceDownload",image);   //发送相册下载信号
+        ccount++;
+        if(!image.is_xiangce)
+          console.warn(" 下载失败  -> " + image.filename + " -> 已达到下载次数限制");
+        if(image.is_xiangce && image.xiangce && image.xiangce.length > 1){
+          image.complete = true;
+          image.xiangce.pop();
+          succount++;
+          console.log(" 下载成功  -> " + image.basePath
+            + "   剩余 " + (images.length - ccount));
+          storage.writeLog(logFile,images);
         }
         else{
-          ccount++;
-          if(!image.is_xiangce)
-            console.warn(" 下载失败  -> " + image.filename + " -> 已达到下载次数限制");
-          if(image.is_xiangce && image.xiangce && image.xiangce.length > 1){
-            image.complete = true;
-            image.xiangce.pop();
-            succount++;
-            console.log(" 下载成功  -> " + image.basePath
-             + "   剩余 " + (images.length - ccount));
-            storage.writeLog(logFile,images);
-          }
-          else{
-            image.complete = false;
-            failcount++;
-          }
-          if(ccount >= images.length){
-            download.emit("allFinished");
-          }
+          image.complete = false;
+          failcount++;
+        }
+        if(ccount >= images.length){
+          download.emit("allFinished");
         }
       }
     });
